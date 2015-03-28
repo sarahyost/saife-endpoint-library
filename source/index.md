@@ -41,11 +41,6 @@ This document is divided in the following sections:
 
 Once the APIs are downloaded, the next step is to make a directory to unpack the SAIFE header files and shared library files. You may also unpack them to a system location such as /usr/local.
 
-mkdir ~/Development/Saife
-cd ~/Development/Saife
-tar -xzf  libSaife-1.0.0-documentation.tar.gz
-tar -xzf  libSaife-1.0.0-linux_x86_64_gnu.tar.g
-
 ```shell
 mkdir ~/Development/Saife
 cd ~/Development/Saife
@@ -53,20 +48,27 @@ tar -xzf  libSaife-1.0.0-documentation.tar.gz
 tar -xzf  libSaife-1.0.0-linux_x86_64_gnu.tar.gz
 ```
 
+mkdir ~/Development/Saife
+cd ~/Development/Saife
+tar -xzf  libSaife-1.0.0-documentation.tar.gz
+tar -xzf  libSaife-1.0.0-linux_x86_64_gnu.tar.g
+
 The following is a sketch of the resulting directory structure:
 
-doc/ .............. Saife C++ Library documentation for offline usage 
-examples/ ......... Example Saife enabled applications
-    hello_world ...... Very basic Saife enabled application showing usage of Secure Messaging
-include/ ............. Saife C++ Library header files
-lib/ ................  All the Saife C++ Libraries needed to link to your application
+   |   |
+---|----|
+doc/       | Saife C++ Library documentation for offline usage |
+examples/   | Example Saife enabled applications  |
+  hello_world   | Very basic SAIFE-enabled application showing usage of Secure Messaging |
+include/    | Saife C++ Library header files  |
+lib/        | All the Saife C++ Libraries needed to link to your application  |
 
 
 ##Developer Account
 
-You will need the following developer information from SAIFE support before you can use your software or the provided examples with the SAIFE network.
+You will need to set up a SAIFE Dashboard account to get started. Visit [dashboard.saifeinc.com](https://dashboard.saifeinc.com) and register with your email address. You may want to create an organization and a group at your first log-in - endpoint applications will require an organizationID to be provisioned and a groupID to communicate with other applications. 
 
-SAIFE Dashboard URL (i.e., https://management.tiprnet.net), domain name, user name and password.
+Later, you can create your own custom management dashboard using SAIFE's Management Services API, but for now, the SAIFE Dashboard will make provisioning and testing applications much easier.
 
 ##Start Coding
 
