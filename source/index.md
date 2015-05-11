@@ -18,17 +18,19 @@ search: true
 
 #Overview
 
-**Welcome to the SAIFE® Endpoint Library!** 
+**Welcome to the SAIFE® Endpoint Library Documentation!** 
 
-This document will guide you in integrating the SAIFE platform and features into your applications, using either C++ or Java. The Endpoint Library provide a framework for  ensuring the authenticity of all your endpoints, whether small sensors, smartphones, laptops, or smart refrigerators, as well as the integrity of all your data. Feel free to check out the recently released [SAIFE Management API documentation](http://saifeinc.com/developers/libraries/management/), for creating custom management dashboards, and refer to [saifeinc.com](http://saifeinc.com/), our [developer page](http://saifeinc.com/developers/), or our [support forums](https://saife.zendesk.com/hc/en-us) for a a thorough introduction to the SAIFE system architecture.
+SAIFE is a patented security platform that provides trusted routing over untrusted networks for any IP-based endpoint. SAIFE, Inc. created a secure, distributed, global network to create secure tunnels between SAIFE-enabled devices. All traffic is signed, bi-directionally authenticated, and encrypted.
 
-SAIFE is a patented security platform that provides trusted routing over untrusted networks for any IP-based endpoint. SAIFE uses a secure, distributed, global network to create secure tunnels between SAIFE-enabled devices. All traffic is signed, bi-directionally authenticated, and encrypted.
+Integrating the SAIFE Endpoint Library into your applications allows you to build your own self-contained public key infrastructure (PKI). Every endpoint and network component is given a unique public certificate, which is validated and signed by [the SAIFE Dashboard](https://dashboard.saifeinc.com/). The Dashboard also allows you to provision endpoints and create secure groups, ensuring that communication only occurs between the specified, trusted endpoints within a secure group. 
 
-The SAIFE Endpoint Library allows you to create your own self-contained public key infrastructure (PKI). Every endpoint and network component is given a unique public certificate, which is validated and signed by [the SAIFE Dashboard](https://dashboard.saifeinc.com/). The Dashboard also allows you to provision endpoints and create secure groups, ensuring that communication only occurs between the specified, trusted endpoints within a secure group. This version of the Endpoint Library provides 128 bit encryption; if 256 bit encrpytion is required, please [contact](mailto:sales@saifeinc.com) our export control team.
+This document will guide you in integrating the SAIFE platform and features into your applications. The Endpoint Library ensures the authenticity of all your endpoints, whether small sensors, smartphones, laptops, or smart refrigerators, as well as the integrity of all your data. Two versions of the library are currently available, in C++ and Java, providing 128 bit encryption. If your project requires 256 bit encrpytion, please [contact us](mailto:sales@saifeinc.com).
+
+Let's work together to secure the Internet of Things! Feel free to check out the recently released [SAIFE® Management API documentation](http://saifeinc.com/developers/libraries/management/) as well, for creating custom management dashboards, and refer to [saifeinc.com](http://saifeinc.com/), our [developer page](http://saifeinc.com/developers/), or our [support forums](https://saife.zendesk.com/hc/en-us) for a a thorough introduction to the SAIFE system architecture. 
 
 This document is divided in the following sections:
 
-* [Getting Started](#getting-started) - for those of you who want to start compiling and running immediately.
+* [Getting Started](#getting-started) - for those of you who want to start compiling and running immediately!
 * [API Overview](#api-overview) - a brief description of the key API classes.
 * [Anatomy of a SAIFE Application](#anatomy-of-a-saife-application) - provides an in-depth explanation of the anatomy of a SAIFE application.
 * [Release Notes](#release-notes) - latest updates.
@@ -39,17 +41,23 @@ This document is divided in the following sections:
 #Getting Started
 
 ##Downloading the Endpoint Source Code
-@TODO. Directions to store.saifeinc.com and instructions for downloading the right library & a copy of this documentation.
 
-Export: export designation implies the library is restricted to 128 bit cryptography.
+The SAIFE® Endpoint library can be downloaded for free at [store.saifeinc.com](https://store.saifeinc.com/). You'll be able to select the Java version, C++ version, or both. The download packages come with a version of this guide, auto-generated code documentation, and our Developer Agreement.
 
-C++ Doxygen: libSaife-2.0.1-documentation.tar.gz
+As a note, SAIFE's technology is export-controlled - distribution outside of United States-approved countries can get tricky. Please refer to the Developer Agreement or [contact us](mailto:sales@saifeinc.com) for more information. 
 
-C++ Linux x86_64: libSaife-2.0.1-linux_x86_64_gnu.tar.gz
+Your downloaded files will include:
 
-Java Doc: java-lib-2.0.1-javadoc.jar
+**C++:**
+* libSaife-2.0.1-linux_x86_64_gnu.tar.gz (for 64 bit Linux; other versions available upon request)
+* libSaife-2.0.1-documentation.tar.gz
+* SAIFE_Developer_Agreement_v1.pdf
 
-Java Linux x86_64 (JNI): java-lib-2.0.1-linux_x86_64.tar.gz
+**Java:**
+* java-lib-2.0.1-linux_x86_64.tar.gz (for 64 bit Linux; other versions available upon request)
+* Java Doc: java-lib-2.0.1-javadoc.jar
+* SAIFE_Developer_Agreement_v1.pdf
+
 
 
 ##Installation
@@ -97,25 +105,27 @@ lib/        | All the JNI native libraries needed to link to your application |
 
 ##Developer Account
 
-You will need to set up a **SAIFE Dashboard** account to get started. Visit [dashboard.saifeinc.com](https://dashboard.saifeinc.com) and register with your email address. You may want to create an organization and a group at your first log-in - endpoint applications will require an organizationID to be provisioned and a groupID to communicate with other applications. 
+You will need to set up a free **SAIFE® Dashboard** account to get started. Visit [dashboard.saifeinc.com](https://dashboard.saifeinc.com) and register with your email address. You may want to create an organization and a group at your first log-in - endpoint applications will require an organizationID to be provisioned and a groupID to communicate with other applications. 
 
 Later, you can create your own custom management dashboard using SAIFE's Management Services API, but for now, the SAIFE Dashboard will make provisioning and testing applications much easier.
 
+
 ##Start Coding
 
-Please refer to these sample applications on github, which showcase the features of the APIs: [https://github.com/saifeinc/examples-saife-endpoint-lib](https://github.com/saifeinc/examples-saife-endpoint-lib)
+Please refer to the sample applications on SAIFE's [Github account](https://github.com/saifeinc/examples-saife-endpoint-lib), which showcase the features of the Library.
 
  * **SaifeEchoDemo** - A simple, secure messaging and sessions application using SAIFE Endpoint Library.
 
-The [Anatomy of a SAIFE Application](#anatomy-of-a-saife-application) section, below, provides an in-depth explanation of the anatomy of a SAIFE application.
+The [Anatomy of a SAIFE Application](#anatomy-of-a-saife-application) section, below, provides an in-depth explanation of how a SAIFE messaging application can be built.
+
 
 ###Simple Build Command
 
 Use the following command to build a single file application. Set the environment variable to the location of SAIFE Endpoint Library.
 
-`export SAIFE_HOME=~/Development/Saife`
+`~$ export SAIFE_HOME=~/Development/Saife`
 
-`g++ -o hello_world hello_world.cc -I$SAIFE_HOME/include -L$SAIFE_HOME/lib/saife -lsaife -lCecCryptoEngine -lroxml`
+`~$ g++ -o hello_world hello_world.cc -I$SAIFE_HOME/include -L$SAIFE_HOME/lib/saife -lsaife -lCecCryptoEngine -lroxml`
 
 
 
@@ -126,7 +136,7 @@ Use the following command to build a single file application. Set the environmen
 Your application will use a single interface to command and control the SAIFE® Endpoint Library. This is an aggregation of sub-interfaces, each of which encapsulates a specific set of functions. The sub-interfaces and their respective functionality are listed below.
 
 ```c++
-Aggregation of the sub-interfaces that comprise the SAIFE Library interface.
+Aggregation of the sub-interfaces that comprise the SAIFE Endpoint Library interface.
 #include <saife_interface.h>
 ```
  * **Saife Management Interface** - this interface contains the methods used to manage the state of the SAIFE Endpoint Library and communication with the SAIFE network.
@@ -139,7 +149,7 @@ Aggregation of the sub-interfaces that comprise the SAIFE Library interface.
 SAIFE Endpoint Library uses the factory method design pattern to create instances of the Saife interface. 
 
 #Anatomy of a SAIFE Application
-A typical SAIFE application performs the following tasks in order to utilize secure messaging and sessions.
+A typical SAIFE application will inlcude both secure messaging and secure streaming via sessions. The following tasks will be performed:
 
 1. Initialize
 2. Generate keypair
@@ -151,7 +161,6 @@ A typical SAIFE application performs the following tasks in order to utilize sec
 8. Enable presence 
 9. Initiate/Accept sessions
 
-@TODO: insert that same image diagram again.
 
 ##Initialize
 
@@ -197,19 +206,19 @@ try {
   e.printStackTrace();
 }
 ```
-Initializing the SAIFE Endpoint Library involves the following steps
+Initializing the SAIFE Endpoint Library involves the following steps:
 
 1. Construct an instance of SAIFE Endpoint library
 2. Optionally set the desired logging level
 3. Initialize SAIFE Endpoint Library
 
-The initialize step returns one of the following state:
+The initialize step returns one of the following states:
 
 * ERROR
 * INITIALIZED
 * UNKEYED
 
-The UNKEYED state indicates that a keypair does not exist and the applicaiton is not trusted by the SAIFE network. This is always the case when the application starts for the first time. It may also occur if the keystore has been removed as a result of wipe or revocation.  The application must create a key pair and restart.
+The UNKEYED state indicates that a keypair does not exist and the application is not trusted by the SAIFE network. This is always the case when the application starts for the first time. It may also occur if the keystore has been removed as a result of wipe or revocation.  The application must create a key pair and restart.
 
 The ERROR state indicates that SAIFE Endpoint Library failed to initialize correctly.  The log must be analyzed to find out why.
 
@@ -267,13 +276,13 @@ The UNKEYED state indicates that a keypair does not exist and the application is
 
 The following steps are necessary to generate the required data to become trusted on the SAIFE network.
 
-* Prompt user for password
-* Specify the X509 DN attributes.  Common name is a required attribute
-* Optionally specify logical addresses to associate with the SAIFE endpoint
-* Generate key pair and certificate signing request (CSR)
-* Augment generated capabilities with application specific capabilities
+* Prompt user for password.
+* Specify the X509 DN attributes.  Common name is a required attribute.
+* Optionally specify logical addresses to associate with the SAIFE endpoint.
+* Generate key pair and certificate signing request (CSR).
+* Augment generated capabilities with application-specific capabilities.
 
-The application must restart after completing successfully completing the above steps.  The CSR and capablities (converted to JSON string) are persisted or provided to the user to be used with the SAIFE Dashboard to make this SAIFE endpoint a trusted entity in the SAIFE network.  This process is referred to a provisioning.  Alternatively, the application may use the SAIFE Management Services RESTful API to automate the provisioning process.
+The application must restart after completing successfully completing the above steps.  The CSR and capablities (converted to a JSON string) are persisted or provided to the user to be used with the SAIFE Dashboard to make this SAIFE endpoint a trusted entity in the SAIFE network.  This process is referred to a provisioning.  Alternatively, the application may use the SAIFE Management Services RESTful API to automate the provisioning process.
 
 ##Update SAIFE Data
 
@@ -298,7 +307,7 @@ try {
 }
 ```
 
-The application must periodically download data from the SAIFE network to its signed certificate, revocation and other security critical information. It is up to the application to determine the period based on power, performance, bandwidth and other considerations.
+The application must periodically download data from the SAIFE network to its signed certificate. This data will include revocation updates, new contact updates, and other security-critical information. It is up to the application to determine the period based on power, performance, bandwidth, and other considerations.
 
 ## Unlock SAIFE
 ```c++
@@ -325,7 +334,7 @@ try {
   e1.printStackTrace();
 }
 ```
-The security of the application begins with a strong password from the user.  This password is used by SAIFE to unlock access to keys used to secure all data.  The application must prompt the user for the password and never persist it.  The SAIFE Endpoint Library can not provide any service until it is unlocked.  The application may check the lock status and lock access if the user is inactive.
+The security of the application begins with a strong password from the user.  This password is used by SAIFE to unlock access to keys used to secure all data.  The application must prompt the user for the password and never persist it.  The SAIFE Endpoint Library cannot provide any service until it is unlocked.  The application may check the lock status and lock access if the user is inactive.
 
 ## Subscribe for messages
 ```c++
@@ -389,7 +398,7 @@ try {
 }
 ```
 
-The SAIFE application can send secure messages to contacts in its contact list. The messages will reside in the SAIFE network until retrieved by the intended recipient or until the specified time to live, whichever is shorter. A delivery confirmation may also be requested if desired by the application.
+The SAIFE application can send secure messages to all contacts in its contact list. The messages will reside in the SAIFE network until retrieved by the intended recipient or until the specified time to live, whichever is shorter. A delivery confirmation may also be requested if desired by the application.
 
 ##Receive Secure Messages
 
@@ -546,19 +555,26 @@ try {
 ```
 The SAIFE application can accept incoming secure sessions from contacts in its contact list.  Both participants in the session must have presence enabled and established with the SAIFE network in order establish a secure session.  The incoming session may have a LOSSLESS (TCP) or LOSSY (UDP) transport type.  It is up to the application to properly frame data sent/received over secure sessions.
 
-#Release Notes
+
+# Questions & Additional Resources
+
+* SAIFE's [support site](https://saife.zendesk.com/hc/en-us) contains forums, FAQs, and release notes for all of SAIFE, Inc.'s products, including the Libraries. You can also reach out to us directly at support@saifeinc.com.
+* For a thorough introduction to the SAIFE system architecture, check out our [developer page](http://saifeinc.com/developers/). Or learn more via our [security blog](http://saifeinc.com/news/), or our [whitepapers](http://saifeinc.com/papers/) and instructional [videos](http://saifeinc.com/videos/).
+* Please also check out the recently released [SAIFE® Management API documentation](http://saifeinc.com/developers/libraries/management/) for creating custom management dashboards.
+
+
+# Release Notes
 
 * **Release 2.0.1** of the SAIFE® Endpoint Library was created on May 08, 2015.
 * **Release 2.0.0** of the SAIFE® Endpoint Library was created on March 25, 2015.
 * **Release 1.0.0** of the SAIFE® Endpoint Library was created on September 15, 2014.
 
 
-
 # Acknowledgements
 
 The SAIFE® Endpoint Library is built upon several open-source technologies. SAIFE Inc. is committed to the open source community and maintains a public [GitHub account](https://github.com/saifeinc/) where all modifications to the open source code are posted.
 
-The following is a complete list of open source projects packaged with our SAIFE products:
+The following is a complete list of open source projects packaged with our SAIFE Endpoint Library:
 
 * **libroxml** - [http://code.google.com/p/libroxml/](http://code.google.com/p/libroxml/ LGPL) LGPL, forked to [https://github.com/saifeinc/libroxml_cecfork](https://github.com/saifeinc/libroxml_cecfork)
 * **BOOST** - [http://www.boost.org](http://www.boost.org) Boost Software License Version 1.0
