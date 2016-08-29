@@ -28,12 +28,12 @@ $examples-bg: #393939;
 $code-bg: #292929;
 $code-annotation-bg: #1c1c1c;
 $nav-subitem-bg: #262626;
-$nav-active-bg: #2467af;
+$nav-active-bg: #ed2e30; // updated from default #2467af
 $lang-select-border: #000;
 $lang-select-bg: #222;
 $lang-select-active-bg: $examples-bg; // feel free to change this to blue or something
 $lang-select-pressed-bg: #111; // color of language tab bg when mouse is pressed
-$main-bg: #eaf2f6;
+$main-bg: #f3f3f3; // updated from default #eaf2f6
 $aside-notice-bg: #8fbcd4;
 $aside-warning-bg: #c97a7e;
 $aside-success-bg: #6ac174;
@@ -68,7 +68,7 @@ $phone-width: $tablet-width - $nav-width; // min width before reverting to mobil
 // FONTS
 ////////////////////
 %default-font {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "News Gothic MT", "Helvetica Neue", Helvetica, Arial, sans-serif; // added News Gothic MT
   font-size: 13px;
 }
 
