@@ -1,255 +1,1172 @@
 ---
-title: SAIFE Endpoint Library v2.0.0 Documentation
+title: SAIFE Endpoint Library v2.1.0 Documentation
 
 language_tabs:
-  - C++
-  - Java
+  - cpp: C++
+  - java: Java
 
 toc_footers:
-  - Version 2.0.0
+  - Version 2.1.0
   - <a href='https://saifeinc.com/developers'>Become a SAIFE Developer</a>
   - <a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a>
-  - Copyright 2014-2015 SAIFE, Inc.
+  - Copyright 2014-2016 SAIFE, Inc.
   - All Rights Reserved
   - <a href='https://github.com/saifeinc'>Fork on Github</a>
 
 search: true
 ---
 
-#Overview
+#Introduction
 
 **Welcome to the SAIFE® Endpoint Library!** 
 
-This document will guide you in integrating the SAIFE platform and features into your applications, using either C++ or Java. The Endpoint Library provide a framework for  ensuring the authenticity of all your endpoints, whether small sensors, smartphones, laptops, or smart refrigerators, as well as the integrity of all your data. Feel free to check out the recently released [SAIFE Management API documentation](http://saifeinc.com/developers/libraries/management/), for creating custom management dashboards, and refer to [saifeinc.com](http://saifeinc.com/), our [developer page](http://saifeinc.com/developers/), or our [support forums](https://saife.zendesk.com/hc/en-us) for a a thorough introduction to the SAIFE system architecture.
+##About the SAIFE® Endpoint Library
 
-SAIFE is a patented security platform that provides trusted routing over untrusted networks for any IP-based endpoint. SAIFE uses a secure, distributed, global network to create secure tunnels between SAIFE-enabled devices. All traffic is signed, bi-directionally authenticated, and encrypted.
+SAIFE® is the world’s most complete application security platform.  With its cutting-edge authentication framework, SAIFE provides the most secure way of sending, receiving, and storing data via the Internet.  Sensitive data – from text messages to documents to streaming video – can be transported with unparalleled privacy and protection.
 
-The SAIFE Endpoint Library allows you to create your own self-contained public key infrastructure (PKI). Every endpoint and network component is given a unique public certificate, which is validated and signed by [the SAIFE Dashboard](https://dashboard.saifeinc.com/). The Dashboard also allows you to provision endpoints and create secure groups, ensuring that communication only occurs between the specified, trusted endpoints within a secure group. This version of the Endpoint Library provides 128 bit encryption; if 256 bit encrpytion is required, please [contact](mailto:sales@saifeinc.com) our export control team.
+The SAIFE SDK allows you to easily build, launch, and scale your own secure applications on SAIFE’s communications platform.  As SAIFE’s core communication library, the SAIFE Endpoint Library enables your application’s endpoints to securely communicate with trusted peers over SAIFE’s network.  Integrate the SAIFE Endpoint Library into your code and immediately achieve a significant risk reduction for your data and a new technological advantage for your users.
 
-This document is divided in the following sections:
+##Supported Platforms
 
-* [Getting Started](#getting-started) - for those of you who want to start compiling and running immediately.
-* [API Overview](#api-overview) - a brief description of the key API classes.
-* [Anatomy of a SAIFE Application](#anatomy-of-a-saife-application) - provides an in-depth explanation of the anatomy of a SAIFE application.
-* [Release Notes](#release-notes) - latest updates.
-* [Acknowledgements](#acknowledgements) - thanks, copyright information, and GitHub link.
+The SAIFE Endpoint Library is currently available in both C++ and Java, and currently supports Android™, iOS, OS X, and Linux®.
 
+ | Android™ | iOS | OS X | Linux®
+------------ | ------------- | ------------- | ------------- | -------------
+**Minimum Platform Version** | 4.0.3 (API 14, NDK r10c) | 8.0 | 10.8 | Red Hat® Enterprise Linux® (RHEL)/CentOS 6.6
+**Language(s)** | Java | C++, Objective-C, Swift | Java, C++ | Java, C++
+**Architecture** | ARM | ARM (ARMv7, ARMv7s, ARM 64-bit) | x86-64 | x86-64
 
+##Prerequisites
+
+As the basic unit of identification and validation, the public certificate plays a central role in SAIFE’s trust-centric paradigm.  As such, your application’s endpoints must be able to address each other via certificate, not IP address.
+
+Furthermore, each of your application’s endpoints must be able to generate a keypair on the device.  On-endpoint keypair generation requires that devices be able to generate enough entropy so that private keys are sufficiently random.
+
+##Encryption Strength
+
+The readily available version of the SAIFE Endpoint Library utilizes 128-bit AES encryption.  If you require AES-256 encryption now or in the future, please email us at [sales@saifeinc.com](mailto:sales@saifeinc.com), and we’ll send you an End-User Certificate that you’ll need to sign and email back to us.
+
+##Export Control Restrictions
+
+Please note that SAIFE’s technology – which uses encryption – is subject to export control restrictions from the United States Department of Commerce, among other laws and regulations.  By downloading the SDK, you are required to comply with all applicable restrictions.  Namely, you may not export or transfer the SDK to prohibited countries or persons, nor may you use the SDK for prohibited purposes.  Please see [SAIFE’s Terms of Use](http://saifeinc.com/policies/saife_terms.pdf) for more information.
+
+##About This Documentation
+
+This reference will guide you in integrating the SAIFE Endpoint Library into your application.  Code snippets accompany each applicable section, with tabs for C++ and Java.  The documentation is divided into the following sections:
+
+* [Getting Started](#getting-started): Instructions for downloading and unpacking the SAIFE Endpoint Library
+* [Library Overview](#library-overview): An overview of the SAIFE interface and the endpoint state transition model
+* [Typical Application Tasks](#typical-application-tasks): Descriptions and code snippets of common coding tasks
+* [Additional Resources](#additional-resources): A listing of resources for additional support
+* [Release Notes](#release-notes): A brief release history
+* [Acknowledgements](#acknowledgements): A listing of open-source projects used to build the SAIFE Endpoint Library
 
 #Getting Started
 
-##Downloading the Endpoint Source Code
-@TODO. Directions to store.saifeinc.com and instructions for downloading the right library & a copy of this documentation.
+##Creating a SAIFE Developer Account
 
-##Installation
+To be able to download the SAIFE SDK, you must first create a free SAIFE Developer account via the [Sign Up page](http://saifeinc.com/developers/signup/).  Registering takes less than a minute.  In most cases, you’ll instantly receive an email containing a link for downloading the SAIFE SDK; if you do not, your account may require some additional processing on our end.  Click the **download link**, opening a download page.  In the download page, click the **Download** button to download the SDK as a single .zip file.
 
-Once the APIs are downloaded, the next step is to make a directory to unpack the SAIFE header files and shared library files. You may also unpack them to a system location such as `/usr/local`.
+##Unpacking the SAIFE Endpoint Library
 
-```shell
-mkdir ~/Development/Saife
-cd ~/Development/Saife
-tar -xzf  libSaife-1.0.0-documentation.tar.gz
-tar -xzf  libSaife-1.0.0-linux_x86_64_gnu.tar.gz
-```
+The downloaded .zip file contains the SAIFE Endpoint Library in both C++ and Java, which each language having a 64-bit Linux version, a 64-bit Darwin version, and documentation.  Extract the .zip file specific to your target.  You can make a dedicated SAIFE directory on your machine or use a system location.
 
-<code>
-mkdir ~/Development/Saife </br>
-cd ~/Development/Saife </br>
-tar -xzf  libSaife-1.0.0-documentation.tar.gz </br>
-tar -xzf  libSaife-1.0.0-linux_x86_64_gnu.tar.g </br>
-</code>
+Each .zip file contains header files and precompiled library files:
 
-The following is a sketch of the resulting directory structure:
+* the C++/Darwin folder contains an **include** folder (with header files) and a **lib** folder (with dynamic library files);
+* the C++/Linux folder contains an **include** folder (with header files) and a **lib** folder (with shared object files);
+* the Java/Darwin folder contains Java .jar files and a **lib** folder (with dynamic library files); and
+* the Java/Linux folder contains Java .jar files and a **lib** folder (with shared object files).
 
-   |   |
----|----|
-doc/       | Saife C++ Library documentation for offline usage |
-examples/   | Example Saife enabled applications  |
-  hello_world   | Very basic SAIFE-enabled application showing usage of Secure Messaging |
-include/    | Saife C++ Library header files  |
-lib/        | All the Saife C++ Libraries needed to link to your application  |
+##Creating a SAIFE Management Account
 
+After downloading the SAIFE SDK, you’ll want to create a free SAIFE Management account through the [SAIFE Management Dashboard](https://dashboard.saifeinc.com/#/).  The SAIFE Management Dashboard – which provides an intuitive interface for managing your application’s endpoints – will make it easier to test your application.  For testing purposes, you’ll want to create an initial organization and secure contact group in your SAIFE Management Dashboard.  Your endpoints will require an organization in order to be provisioned, and will require a group in order to communicate with other endpoints.
 
-##Developer Account
+For detailed instructions on setting up a SAIFE Management account and setting up your application through the SAIFE Management Dashboard, please refer to the [SAIFE Management API documentation](http://saifeinc.com/developers/libraries/management/).  After initial testing, you can use the SAIFE Management API to build a custom management interface or to create automated functionality, if required.
 
-You will need to set up a **SAIFE Dashboard** account to get started. Visit [dashboard.saifeinc.com](https://dashboard.saifeinc.com) and register with your email address. You may want to create an organization and a group at your first log-in - endpoint applications will require an organizationID to be provisioned and a groupID to communicate with other applications. 
+##Referring to Sample Applications
 
-Later, you can create your own custom management dashboard using SAIFE's Management Services API, but for now, the SAIFE Dashboard will make provisioning and testing applications much easier.
+There are several sample applications on our [GitHub page](https://github.com/saifeinc) that showcase the features of the SAIFE Endpoint Library.  Use these samples as a guide for building your own application.  Sample applications include:
 
-##Start Coding
+* [SaifeMessageDemo](https://github.com/saifeinc/examples-saife-endpoint-lib/tree/develop/SaifeMessageDemo), demonstrating secure messaging, both point-to-point (in the C++ version) and group (in the Java version);
+* [SaifeEchoDemo](https://github.com/saifeinc/examples-saife-endpoint-lib/tree/develop/SaifeEchoDemo), demonstrating secure messaging and sessions;
+* [SAIFEDARDemo](https://github.com/saifeinc/examples-saife-endpoint-lib/tree/develop/SAIFEDARDemo), demonstrating secure data at rest (DAR); and
+* [SAIFENSDemo](https://github.com/saifeinc/examples-saife-endpoint-lib/tree/develop/SAIFENSDemo), demonstrating secure network share (NS) via Amazon Simple Storage Service (S3).
 
-Please refer to these sample applications on github, which showcase the features of the APIs: [https://github.com/saifeinc/examples-saife-endpoint-lib](https://github.com/saifeinc/examples-saife-endpoint-lib)
+#Library Overview
 
- * **SaifeMessageDemo** - A simple, secure messaging application using SAIFE Endpoint Library.
- * **SaifeSessionDemo** - @TODO.
+##The SAIFE Interface
 
-The [Anatomy of a SAIFE Application](#anatomy-of-a-saife-application) section, below, provides an in-depth explanation of the anatomy of a SAIFE application.
+Your application will use a single interface (**SaifeInterface**) to command and control the SAIFE Endpoint Library.  The SAIFE interface is an aggregation of sub-interfaces, each of which encapsulates a specific set of functions.  These sub-interfaces include:
 
-###Simple Build Command
+* the SAIFE Management Interface (**SaifeManagementInterface**), which contains the methods used to manage the state of the SAIFE Endpoint Library and communication with SAIFE’s network;
+* the SAIFE Messaging Interface (**SaifeMessagingInterface**), which contains the methods used to secure messages between endpoints;
+* the SAIFE Contact Interface (**SaifeContactServiceInterface**), which contains the methods used to address endpoints; and
+* the SAIFE Session Interface (**SaifeSecureSessionInterface**), which contains the methods used to secure sessions between endpoints.
 
-Use the following command to build a single file application. Set the environment variable to the location of SAIFE Endpoint Library.
+The SAIFE Endpoint Library uses the factory method – via the SAIFE factory class (**SaifeFactory**) – for creating instances of SaifeInterface.
 
-`export SAIFE_HOME=~/Development/Saife`
+##Endpoint State Transition Model
 
-`g++ -o hello_world hello_world.cc -I$SAIFE_HOME/include -L$SAIFE_HOME/lib/saife -lsaife -lCecCryptoEngine -lroxml`
+The SAIFE Endpoint Library defines eight endpoint states.
 
+###Provisioning States
 
+Each of your endpoints will progress through four states during the provisioning process: Null, Unkeyed, Unprovisioned and Provisioned.  Provisioning is the act of an endpoint establishing an identity with SAIFE’s network.
 
-#API Overview
+1. An endpoint that has not been loaded with your application is in the **Null** state.
+2. Upon installation of your application, the endpoint will transition to the **Unkeyed** state.
+	* An endpoint may also be in this state if its keypair has been removed as a result of revocation; in this case, the application must create a keypair and restart.
+3. When the endpoint generates a cryptographic keypair (public and private keys) and certificate signing request (CSR) based on the public key, it will transition to the **Unprovisioned** state.
+	* The public key can be used by a trusted peer to encrypt data intended for the endpoint, while the private key is used to decrypt that data.
+4. In order to transition to the **Provisioned** state, the endpoint must submit its CSR to management services (the SAIFE Management Dashboard), which will then validate the endpoint by signing its public certificate.
+	* The public certificate is a cryptographic fingerprint that binds the endpoint’s identity with its public key, providing a means for SAIFE’s network to identify and authenticate the endpoint.
+	* Management services will send the signed public certificate – along with initial configuration data (such as certificate revocation lists) – to the endpoint.
 
-##SaifeInterface Class
+###Subscription States
 
-Your application will use **saife::SaifeInterface** to command and control the SAIFE® Endpoint Library. The **saife::SaifeInterface** is an aggregation of sub-interfaces, each of which encapsulates a specific set of functions. The sub-interfaces and their respective functionality are listed below.
+The provisioned endpoint will either be in the **Subscribed** or **Unsubscribed** state, depending on its subscription.  Subscription is the act of an endpoint registering with SAIFE’s network to receive the secure messages that have been assigned to it.
 
-```c++
-Aggregation of the sub-interfaces that comprise the SAIFE Library interface.
-#include <saife_interface.h>
-// Not sure what all should go here.
-```
+###Presence States
 
- * **saife::SaifeManagementInterface** - this interface contains the methods used to manage the state of the SAIFE Endpoint Library. See [States](##states) for a description of the various states.
- * **saife::SaifeMessagingInterface** - this interface contains the methods used to secure messages between two SAIFE-enabled endpoints.
- * **saife::SaifeContactServiceInterface** - this interface contains the methods needed to be able to address other SAIFE-enabled endpoints.
+The provisioned endpoint will also either be in the **Registered** or **Unregistered** state, depending on its presence.  Presence, which is necessary for the establishment of secure streaming sessions, is the act of an endpoint registering its online status with SAIFE’s network.  Presence allows SAIFE’s network to map an endpoint without sharing or storing its IP address.
 
-##SaifeFactory Class
+#Typical Application Tasks
 
-SAIFE Endpoint Library uses the factory method design pattern to create instances of saife::SaifeInterface. The saife::SaifeFactory is used to create different flavors of saife::SaifeInterface. Within the saife::SaifeFactory, there are different "Construct" methods available depending on your application.
+##Basic Application Tasks
 
-##States
+For every application built with the SAIFE Endpoint Library, there are common application tasks that will need to be coded, including initializing the SAIFE Endpoint Library, generating a keypair, updating SAIFE data, and unlocking SAIFE.
 
-In order to understand the life-cycle of a SAIFE endpoint, it is necessary to describe the possible values of saife::SaifeManagementState. These states are manipulated via the saife::SaifeManagementInterface.
-
-@TODO: insert image diagram, if possible
-
-* SAIFE_UNINITIALIZED - after constructing the SaifeInterface via the SaifeFactory, the SaifeInterface starts in the Unitialized state. Initializing the SaifeInterface with saife::SaifeManagementInterface::Initialize while in this state will take it to either the Unkeyed or Initialized state, depending on whether the endpoint has a keypair.
-* SAIFE_UNKEYED - in this state, the SAIFE endpoint has not yet generated a keypair. Generating a keypair (including formation of a Certificate Signing Request or CSR) using saife::SaifeManagementInterface::GenerateKeys causes a transition to the Initialized state.
-* SAIFE_INITIALIZED - a SAIFE endpoint is initialized and ready to used for provisioning, messaging and other services.
-
-
-
-#Anatomy of a SAIFE Application
-A SAIFE application begins its life cycle by first obtaining an instance of the SaifeInterface via the saife::SaifeFactory::ConstructLocalSaife. This instance begins in the saife::SAIFE_UNINITIALIZED state and follows the following simple state machine.
-
-@TODO: insert that same image diagram again.
-
-##Initialization
+###Initializing the SAIFE Endpoint Library
 
 ```c++
 try {
-   state = saife_ptr->Initialize(store, hosts, ports, false);
- } catch (SaifeException& se) {
-   std::cerr << "Failed to initialize with error: " << se.error() << std::endl;
-   return (1);
- } catch (...) {
-   std::cerr << "Failed to initialize library with unexpected error" << std::endl;
-   return (1);
- }
- ```
+  LogSinkFactory logSinkFactory;
+  //LogSinkManagerInterface *logMgr = logSinkFactory.CreateFileSink(defaultKeyStore + "/log");
+  LogSinkManagerInterface *logMgr = logSinkFactory.CreateConsoleSink();
 
-The first step after obtaining a saife::SaifeInterface instance is to call saife::SaifeManagementInterface::Initialize. This call moves the state machine from saife::SAIFE_UNINITIALIZED state into either the saife::SAIFE_INITIALIZED or saife::SAIFE_UNKEYED state. The transition to saife::SAIFE_UNKEYED state occurs when the interface is instantiated for the first time and a valid persisted keystore doesn't exist. The transition to saife::SAIFE_INITIALIZED state occurs if a persisted keystore is found and loaded successfully. The call to saife::SaifeManagementInterface::Initialize returns the appropriate state value.
+  // Create instance of SAIFE. A log manager may be optionally specified to redirect SAIFE logging.
+  SaifeFactory factory;
+  saife_ptr = factory.ConstructLocalSaife(logMgr);
 
-##The UNKEYED state
+  // Set SAIFE logging level.
+  saife_ptr->SetSaifeLogLevel(LogSinkInterface::SAIFE_LOG_WARNING);
 
-```c++
-const std::string sms_url = "http://your.url.com";
-const std::string sms_domain = "your.domain";
-const std::string sms_user = "your.admin";
-const std::string sms_password = "yourreallylongpassword";
-const SaifeManagementCredentials sms_creds(sms_url, sms_domain, sms_user, sms_password);
-// The alias chosen here should be unique within the application's namespace. The SAIFE network enforces uniqueness of alias names
-const std::string alias("HelloWorldApp");
-const DistinguishedName dn(alias);
-saife_ptr->GenerateKeys(dn, password, sms_creds, address_list);
-```
+  // Initialize the SAIFE interface.
+  SaifeManagementState state = saife_ptr->Initialize(defaultKeyStore);
 
-This saife::SAIFE_UNKEYED state indicates that a keypair does not exist and the applicaiton is not trusted by the SAIFE network. This is the case when the application starts for the first time. It may also occur if the keystore has been removed as a result of wipe or revocation. The code sample below is an example of how to generate a keypair and become trusted by the SAIFE network.
+  if (state != saife::SAIFE_UNKEYED && state != saife::SAIFE_INITIALIZED) {
+    std::cerr << "failed to initialize SAIFE" << std::endl;
+    return 1;
+  }
 
-The saife::SaifeManagementInterface::GenerateKeys function generates the keystore and registers and establishes trust with the SAIFE network. It requires several parameters including a password to secure the keypair and credentials for use with SAIFE Dashboard. The state machine will be in saife::SAIFE_INITIALIZED state upon successful completion.
-
-The saife::SaifeManagementCredentials class requires the creation of a SAIFE® developer account. The developer must contact SAIFE support (support@saifeinc.com) to obtain the credentials necessary for instantiating the saife::SaifeManagementCredentials class. SAIFE Management Library uses these credentials to authenticate the endpoint during registration with the SAIFE Dashboard. Upon successful registration with the SAIFE Dashboard the endpoint becomes a trusted entity within the SAIFE network and is capable of performing secure communications.
-
-###Addressing
-
-```c++
-SaifeAddress app_id;
-app_id.set_address("067e6162-3b6f-4ae2-a171-2470b63dff00"); // An example UID. Should really be generated in a way that it is unique for each app instance
-app_id.set_address_type(kUidAddressType);
-address_list.push_back(app_id);
-SaifeAddress app_uri;
-app_uri.set_address("urn:oasis:names:specification:docbook:dtd:xml:4.1.2"); // Taken from the example of a URN in RFC 3986
-app_uri.set_address_type(kUriAddressType);
-address_list.push_back(app_id);
-```
-
-The application can optionally define one or more addresses to include as metadata to other SAIFE applications as part of key generation and registering with the SAIFE network. An address could be a UID of some kind, an URL/URI, a name, or any other metadata that can be represented as a string. The following code snippet highlights the ability of the application to specify its own addressing scheme.
-
-##Provisioning
-
-```c++
- // Refresh data from SAIFE network
- try {
-   saife_ptr->UpdateSaifeData();
- } catch (SaifeException& se) {
-   std::cerr << "Failed to sync with SAIFE network. Error: " << se.error() << std::endl;
-   return (1);
- } catch (...) {
-   std::cerr << "Failed to with SAIFE network with unexpected error" << std::endl;
-   return (1);
- }
- ```
-
-After generating the keystore and registering with the SAIFE network, the application can download data from the SAIFE network. This code snippet is only showing one call to saife::SaifeManagementInterface::UpdateSaifeData. However, it should be called periodically to poll for updates from the SAIFE network. It is up to the application to determine the period based on power, performance, bandwidth and other considerations.
-
-A list of SAIFE contacts is part of the data downloaded from the SAIFE network. The SAIFE Dashboard is used to group the contacts in the list and manage them. The application can securely communicate with only the trusted contacts in its contact list.
-
-
-##Send Secure Messages
-
-```c++
-SaifeContact contact = saife_ptr->GetContactByAlias(backup_server_alias);
-saife_ptr->SendMessage(msg_bytes, kMessageType, contact, ttl_secs, tts_msecs, false);
-```
-
-The SAIFE application uses saife::SaifeMessagingInterface::SendMessage to send secure messages to a contact in its contact list. The message will reside in the SAIFE network until retrieved by the contact or until the specified time to live, whichever is shorter. A delivery confirmation may also be requested if relevent to the application.
-
-The following code snippet demonstrates how to get the saife::SaifeContact using a lookup by alias function and securely send a message to it. A custom address may also be provided to this function if the application has defined an alternate addressing scheme.
-
-##Receive Secure Messages
-
-```c++
-saife_ptr->Subscribe();
-std::vector<SaifeMessagingInterface::SaifeMessageData*> message_ptrs;
-adapter_->GetMessages(kMessageType, &message_ptrs);
-if ( 0 == message_ptrs.size()) {
-  std::cout << "There are no messages " << std::endl;
-} else {
-  std::cout << "Received a message" << std::endl;
+} catch (InvalidManagementStateException& e) {
+  std::cerr << e.error() << std::endl;
+} catch (SaifeInvalidCredentialException& e) {
+  std::cerr << e.error() << std::endl;
+} catch (...) {
+  std::cerr << "Failed to initialize library with unexpected error" << std::endl;
 }
 ```
 
-The SAIFE application uses saife::SaifeMessagingInterface::Subscribe to register with the SAIFE network to receive messages. Subscription keeps a connection active with the SAIFE network so that it may deliver messages immediately. Once subscribed, saife::SaifeMessagingInterface::GetMessages is called periodically to see if any messages were received from the SAIFE network. It is up to the application to determine the best period. The saife::SaifeMessagingInterface::Unsubscribe function is called to unscubribe for messages and close the connection with the SAIFE network. This is useful for applications that don't want to maintain a persistent connection with the SAIFE network.
+```java
+// Initialize SAIFE.
+try {
+  // final LogSinkManager logMgr = LogSinkFactory.constructFileSinkManager(defaultKeyStore + "/log");
+  // final LogSinkManager logMgr = LogSinkFactory.constructConsoleSinkManager();
 
+  // Create instance of SAIFE. A log manager may be optionally specified to redirect SAIFE logging.
+  saife = SaifeFactory.constructSaife(logMgr);
 
+  // Set SAIFE logging level.
+  saife.setSaifeLogLevel(LogLevel.SAIFE_LOG_WARNING);
+
+  // Initialize the SAIFE interface at the specified path.
+  final ManagementState state = saife.initialize(defaultKeyStorePath);
+
+} catch (final InvalidManagementStateException e) {
+  e.printStackTrace();
+} catch (final InvalidCredentialException e) {
+  e.printStackTrace();
+} catch (final IOException e) {
+  e.printStackTrace();
+}
+```
+
+Upon installation, your application must first initialize the SAIFE Endpoint Library.  This allows the endpoint to transition from the Null state to the Unkeyed state.
+
+Initializing the SAIFE Endpoint Library involves:
+
+* constructing an instance of the SAIFE Endpoint Library (using SaifeFactory);
+* optionally setting the desired logging level; and
+* initializing SaifeInterface.
+
+If an error is returned, this indicates that the SAIFE Endpoint Library failed to initialize correctly; the log must be analyzed to figure out the reason for failure.
+
+###Generating a Keypair
+
+```c++
+if (state == saife::SAIFE_UNKEYED) {
+  // Set up the DN attributes to be used in the X.509 certificate.
+  const DistinguishedName dn("SaifeEcho");
+
+  // Generate the public/private keypair and certificate signing request.
+  CertificateSigningRequest *certificate_signing_request = new CertificateSigningRequest();
+  saife_ptr->GenerateSmCsr(dn, defaultPassword, certificate_signing_request);
+
+  // Add additional capabilities to the SAIFE capabilities list that convey the application-specific capabilities.
+  std::vector< std::string > capabilities = certificate_signing_request->capabilities();
+  capabilities.push_back("com::saife::demo::echo");
+
+  // Provide CSR and capabilities (JSON string) to user for provisioning.
+  std::string fName = defaultKeyStore + "/newkey.smcsr";
+  std::ofstream f(fName.c_str());
+  if (f.is_open()) {
+    f << "CSR: " << certificate_signing_request->csr() << std::endl;
+    // This should really be done with a proper JSON library.
+    f << "CAPS: [";
+    for (unsigned int i = 0; i < capabilities.size(); i++) {
+      f << "\"" << capabilities[i] << "\"";
+      if (i != capabilities.size() - 1) {
+        f << ",";
+      }
+    }
+    f << "]" << std::endl;
+  }
+  f.close();
+}
+```
+
+```java
+// Check the management state.
+if (state == ManagementState.UNKEYED) {
+
+  // Set up the DN attributes to be used in the X.509 certificate.
+  final DistinguishedName dn = new DistinguishedName("SaifeEcho");
+
+  // Add the required amount of entropy.
+  boolean entropic = false;
+
+  CertificationSigningRequest csr = null;
+
+  final FileInputStream fin 
+    = new FileInputStream("/dev/urandom");
+
+  byte[] b;
+
+  while (!entropic) {
+    try {
+      b = new byte[32];
+      fin.read(b);
+
+      System.out.println("adding entropy to SAIFE library");
+      saife.AddEntropy(b, 4);
+
+      // Generate the public/private keypair and certificate signing request.
+      csr = saife.generateSmCsr(dn, defaultPassword);
+
+      entropic = true;
+    } catch (final InsufficientEntropyException e) {
+      System.out.println(e.getMessage());
+      entropic = false;
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+  }
+  try {
+    fin.close();
+  } catch (final IOException e) {}
+
+  // Add additional capabilities to the SAIFE capabilities list that convey application-specific capabilities.
+  final List<String> capabilities = csr.getCapabilities();
+  capabilities.add("com::saife::demo::echo");
+
+  // Provide CSR and capabilities (JSON string) to user for provisioning.
+  final PrintWriter f = new PrintWriter(defaultKeyStorePath + "/newkey.smcsr");
+  f.println("CSR: " + csr.getEncodedCsr());
+  final Gson gson = new Gson();
+  f.println("CAPS: " + gson.toJson(capabilities));
+  f.close();
+
+} else if (state == ManagementState.ERROR) {
+  System.out.println("failed to initialize SAIFE");
+} else {
+```
+
+Upon successful initialization, your application must allow the endpoint to generate a unique keypair and CSR, along with a list of SAIFE capabilities (such as encryption strength, roles, and functionalities).  This allows the endpoint to transition from the Unkeyed state to the Unprovisioned state.
+
+Generating a keypair involves:
+
+* setting up the distinguished name (DN) attributes to be used in the X.509 certificate;
+	* The distinguished name structure, which is independent of the SAIFE Management Dashboard, only requires a common name.  The common name is like a nickname for the certificate and is helpful for debugging purposes.  There isn’t a strict format for the common name; for example, it can be a person’s name, an ID, or a location.
+* generating entropy; and
+	* An appropriate entropy source, whether user-supplied or timing-based, is necessary to seed the deterministic random bit generator (DRBG) with a sequence of random bytes used to generate the keypair.  An acceptable level of entropy ensures that the private key is sufficiently random (and thus, difficult for a potential attacker to determine).
+* augmenting the SAIFE capabilities list with application-specific capabilities.
+	* The list of application-specific capabilities allows a SAIFE-enabled endpoint (i.e., an instance of an application built with the SAIFE Endpoint Library) to communicate its feature set to other SAIFE-enabled endpoints for the sake of determining which types of information can be shared.  There isn’t a strict format for the common name; however, it is recommended that you adhere to the namespace conventions for your platform.
+
+After completing these steps, the application must restart.
+
+The CSR (a 376-character string) and SAIFE capabilities list (converted to a JSON string) are necessary for the provisioning process (and transitioning to the Provisioned state).  For manual provisioning, the CSR and capabilities string are provided to the user, allowing the user or a designated administrator to create a certificate in the SAIFE Management Dashboard.  For automated provisioning, the SAIFE Management API (using an API key) can be used to submit the CSR to management services via an HTTPS connection.
+
+###Updating SAIFE Data
+
+```c++
+try {
+  saife_ptr->UpdateSaifeData();
+} catch (InvalidManagementStateException &e) {
+  std::cerr << e.error() << std::endl;
+} catch (saife::io::IOException &e) {
+  std::cerr << e.error() << std::endl;
+}
+```
+
+```java
+// Start a task to periodically update SAIFE data every 10 minutes.
+saifeThreadPool.execute(new Runnable() {
+
+  @Override
+  public void run() {
+    try {
+      saife.updateSaifeData();
+    } catch (final InvalidManagementStateException e) {
+      e.printStackTrace();
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+    saifeThreadPool.schedule(this, 600, TimeUnit.SECONDS);
+  }
+});
+```
+
+Your application must allow the endpoint to periodically download data – including updates to contact lists, revocation lists, and Continuum server lists – from SAIFE’s network.  You may specify the period between downloads based on considerations for power, performance, and bandwidth.
+
+###Unlocking SAIFE
+
+```c++
+// Unlock SAIFE library with user's credential.
+try {
+  saife_ptr->Unlock(defaultPassword);
+} catch (SaifeInvalidCredentialException &e) {
+  std::cerr << e.error() << std::endl;
+} catch (InvalidManagementStateException &e) {
+  std::cerr << e.error() << std::endl;
+}
+```
+
+```java
+// Unlock SAIFE library with user's credential.
+try {
+  saife.unlock(defaultPassword);
+} catch (final InvalidCredentialException e1) {
+  e1.printStackTrace();
+} catch (final InvalidManagementStateException e1) {
+  e1.printStackTrace();
+}
+```
+
+Your application must be protected by a user password, which is used to unlock access to the endpoint’s public/private keypair.  The password must never be persisted.  Your application may check the lock status and lock access if the user is inactive.
+
+##Secure Messaging Tasks
+
+If your application is utilizing SAIFE’s secure messaging (for text strings, images, raw sensor measurements, status updates, etc.), application tasks include subscribing for messages and sending/receiving secure messages.
+
+###Subscribing for Messages
+
+```c++
+// Subscribe for SAIFE messages.
+saife_ptr->Subscribe();
+```
+
+```java
+// Subscribe for SAIFE messages.
+saife.subscribe();
+```
+
+Your application may allow the endpoint to subscribe for messages (thus transitioning from the Unsubscribed state to the Subscribed state).  During the subscription process, the endpoint authenticates itself to SAIFE’s network, and SAIFE’s network authenticates itself to the endpoint.  The endpoint in this state can receive secure messages sent from other endpoints in its secure contact group.  The endpoint must periodically call SAIFE’s network – at an interval specified by your application – to check for any messages addressed to it.
+
+If the endpoint in the Subscribed state does not maintain its subscription via periodic calls to SAIFE’s network, a subscription timeout event will cause a transition back to the Unsubscribed state; your application must monitor the subscription state and re-subscribe if the state changes to Unsubscribed.  If your application does not want to maintain a persistent connection with SAIFE’s network, it may actively unsubscribe for messages.
+
+###Sending Secure Messages
+
+```c++
+try {
+  SaifeContact contact = saife_ptr->GetContactByName(sendTo);
+  int rcvMsgCnt = 0;
+  for (std::vector<std::string>::iterator iter = messageList.begin(); iter != messageList.end(); ++iter) {
+    std::string sendMsg = *iter;
+    std::vector<uint8_t> msg_bytes(sendMsg.begin(), sendMsg.end());
+    saife_ptr->SendMessage(msg_bytes, echoMsgType, contact, 30, 2000, false);
+    std::cout << "Msg >: '" << sendMsg << "'" << std::endl;
+    std::vector<SaifeMessagingInterface::SaifeMessageData *> rcvMsgs;
+    int maxInterval = 0;
+    do {
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      saife_ptr->GetMessages(echoMsgType, &rcvMsgs);
+      ++maxInterval;
+    } while (rcvMsgs.size() == 0 && maxInterval < 100);
+    for (std::vector<SaifeMessagingInterface::SaifeMessageData*>::iterator iter = rcvMsgs.begin();
+          iter != rcvMsgs.end(); ++iter) {
+        SaifeMessagingInterface::SaifeMessageData *msg = *iter;
+      ++rcvMsgCnt;
+      std::string msgstr(msg->message_bytes.begin(), msg->message_bytes.end());
+      std::cout << "Msg <: '" << msgstr << "'" << std::endl;
+    }
+  }
+  std::cout << "Ok .. All done.  Sent " << messageList.size() << " messages and received " << rcvMsgCnt << " messages" << std::endl;
+} catch (NoSuchContactException e) {
+  std::cout << "Oops .. '" << sendTo << "' no such contact.  Go to the Dashboard to manage contacts." << std::endl;
+} catch (saife::io::IOException e) {
+  std::cout << "Oops ... seems like we couldn't send message." << std::endl;
+} catch (LicenseExceededException e) {
+  std::cerr << e.error() << std::endl;
+}
+```
+
+```java
+try {
+  final Contact contact = saife.getContactByName(sendTo);
+  int rcvMsgCnt = 0;
+  for (final String sendMsg : messageList) {
+    saife.sendMessage(sendMsg.getBytes(), echoMsgType, contact, 30, 2000, false);
+    System.out.println("Msg >: '" + sendMsg + "'");
+    List<MessageData> rcvMsgs;
+    int maxInterval = 0;
+    do {
+      try {
+        Thread.sleep(100);
+      } catch (final InterruptedException e) {
+      }
+      rcvMsgs = saife.getMessages(echoMsgType);
+      ++maxInterval;
+    } while (rcvMsgs.size() == 0 && maxInterval < 100);
+    for (final MessageData rcvMsg : rcvMsgs) {
+      ++rcvMsgCnt;
+      System.out.println("Msg <: '" + new String(rcvMsg.message) + "'");
+    }
+  }
+  System.out.println("Ok .. All done.  Sent " + messageList.size() + " messages and received " + rcvMsgCnt
+      + " messages");
+} catch (final NoSuchContactException e) {
+  System.out.println("Waiting for echo server '" + sendTo + "' to get into our contact list.");
+} catch (final IOException e) {
+  System.out.println("Oops ... seems like we couldn't send message.");
+} catch (final LicenseExceededException e) {
+  e.printStackTrace();
+}
+```
+
+Your application may allow the endpoint to send messages to peer endpoints within its secure contact group.  The sending endpoint uses the receiving endpoint’s public key to encrypt – via the AES algorithm – the message that is intended for the private key of the receiving endpoint.  If the receiving endpoint is offline, the message will be temporarily stored (in encrypted form) in SAIFE’s network until the endpoint establishes presence.
+
+###Receiving Secure Messages
+
+```c++
+try {
+  // Get and echo messages.
+  std::vector<SaifeMessagingInterface::SaifeMessageData *> msgs;
+  saife_ptr->GetMessages(echoMsgType, &msgs);
+  for (std::vector<SaifeMessagingInterface::SaifeMessageData*>::iterator iter = msgs.begin();
+      iter != msgs.end(); ++iter) {
+    SaifeMessagingInterface::SaifeMessageData *msg = *iter;
+    std::string msgstr(msg->message_bytes.begin(), msg->message_bytes.end());
+    std::cout << "M:" << msg->sender.name() << " '" << msgstr << "'" << std::endl;
+    saife_ptr->SendMessage(msg->message_bytes, msg->message_type, msg->sender, 30, 2000, false);
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+} catch (NoSuchContactException &e) {
+  std::cerr << e.error() << std::endl;
+} catch (saife::io::IOException &e) {
+  std::cerr << e.error() << std::endl;
+} catch (InvalidManagementStateException &e) {
+  std::cerr << e.error() << std::endl;
+} catch (LicenseExceededException &e) {
+  std::cerr << e.error() << std::endl;
+}
+```
+
+```java
+try {
+  // Get and echo messages.
+  final List<MessageData> msgs = saife.getMessages(echoMsgType);
+  for (final MessageData msg : msgs) {
+    System.out.println("M:" + msg.sender.getName() + " '" + new String(msg.message) + "'");
+    saife.sendMessage(msg.message, msg.messageType, msg.sender, 30, 2000, false);
+  }
+  // Check for messages every second.
+  Thread.sleep(100);
+} catch (final InterruptedException e) {
+  break;
+} catch (final NoSuchContactException e) {
+  System.out.println("Oops .. message client is not in the contact list.  Go to the Dashboard to manage contacts.");
+} catch (final IOException e) {
+  e.printStackTrace();
+} catch (final InvalidManagementStateException e) {
+  e.printStackTrace();
+} catch (final LicenseExceededException e) {
+  e.printStackTrace();
+}
+```
+
+Your application may also allow the endpoint (in the Subscribed state) to receive messages from peer endpoints within its secure contact group.  The receiving endpoint uses its private key to decrypt messages.  Your application may implement the use of delivery confirmations for read messages.
+
+##Group Messaging Tasks
+
+If your application is utilizing SAIFE’s secure group messaging, application tasks include creating/deleting ad-hoc messaging groups, adding/removing members, sending/receiving secure group messages, and leaving the group.
+
+###Creating an Ad-Hoc Messaging Group
+
+```java
+List<Contact> contacts = new Vector<Contact>();
+SecureCommsGroup group;
+
+try {
+    // add some members to a List
+    contacts.add(saife.getContactsByName("client1").get(0));
+    contacts.add(saife.getContactsByName("client2").get(0));
+    contacts.addAll(saife.getContactsByName("user"));
+} catch (final NoSuchContactException nsce) {
+    final String m = imse.getMessage();
+    System.out.println(m);
+} catch (final InvalidManagementStateException imse) {
+    final String m = imse.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // creates a secure communications group
+    // members *MUST* be in an omnigroup together
+    group = saife.createGroup("group1", contacts);
+} catch (final ContactGroupNotFoundException cgnfe) {
+    final String m = cgnfe.getMessage();
+    System.out.println(m);
+} catch (final IllegalArgumentException iae) {
+    final String m = iae.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final KeySizeNotSupportedException ksnse) {
+    final String m = ksnse.getMessage();
+    System.out.println(m);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final Exception e) {
+    final String m = e.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may allow the endpoint to set up an ad-hoc messaging group.  All members of this group must be in the same secure contact group (omni type) as defined via management services (the SAIFE Management Dashboard).  The group owner must define the attributes for the group, including a group name, list of member certificates, and group key.  The group owner uses each group member’s public key to encrypt – via the AES algorithm – the attributes for each group member.  The attributes are sent to each group member.  The group owner then creates a multi-destination welcome message for the group, which is encrypted using the group key.
+
+###Deleting an Ad-Hoc Messaging Group
+
+```java
+SecureCommsGroup group;
+List<String> groups = saife.ListGroups();
+
+try {
+    group = saife.getGroup(groups.get(0));
+} catch (final GroupNotFoundException gnfe) {
+    final String m = gnfe.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // destroy the group
+    group.destroy();
+} catch (final GroupPermissionDeniedException gpde) {
+    final String m = gpde.getMessage();
+    System.out.println(m);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final Exception e) {
+    final String m = e.getMessage();
+    System.out.println(m);
+}
+```
+
+If the group owner does not want to maintain an ad-hoc messaging group, it may delete the group.
+
+###Adding a Member to an Ad-Hoc Messaging Group
+
+```java
+SecureCommsGroup group;
+List<String> groups = saife.ListGroups();
+Contact contact;
+
+try {
+    group = saife.getGroup(groups.get(0));
+    contact = saife.getContactsByName("client1").get(0);
+} catch (final NoSuchContactException nsce) {
+    final String m = nsce.getMessage();
+    System.out.println(m);
+} catch (final GroupNotFoundException gnfe) {
+    final String m = gnfe.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // add member to group
+    group.addMember(contact);
+} catch (final ContactGroupNotFoundException cgnfe) {
+    final String m = cgnfe.getMessage();
+    System.out.println(m);
+} catch (final GroupPermissionDeniedException gpde) {
+    final String m = gpde.getMessage();
+    System.out.println(m);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final Exception e) {
+    final String m = e.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may allow the endpoint to add additional members to the ad-hoc messaging group.
+
+###Removing a Member from an Ad-Hoc Messaging Group
+
+```java
+SecureCommsGroup group;
+List<String> groups = saife.ListGroups();
+Contact contact;
+
+try {
+    group = saife.getGroup(groups.get(0));
+    contact = saife.getContactsByName("client1").get(0);
+} catch (final NoSuchContactException nsce) {
+    final String m = nsce.getMessage();
+    System.out.println(m);
+} catch (final GroupNotFoundException gnfe) {
+    final String m = gnfe.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // remove member from group
+    group.removeMember(contact);
+} catch (final GroupPermissionDeniedException gpde) {
+    final String m = gpde.getMessage();
+    System.out.println(m);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final Exception e) {
+    final String m = e.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may also allow the endpoint to remove members from the ad-hoc messaging group.
+
+###Sending Secure Group Messages
+
+```java
+SecureCommsGroup group;
+List<String> groups = saife.ListGroups();
+String message = "some message";
+
+try {
+    group = saife.getGroup(groups.get(0));
+} catch (final GroupNotFoundException gnfe) {
+    final String m = gnfe.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // send message to the group
+    group.sendMessage(message.getBytes());
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final Exception e) {
+    final String m = e.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may allow the endpoint to send messages to members of its ad-hoc messaging group.  The sending endpoint uses the group key to encrypt the message for the rest of the group.
+
+###Receiving Secure Group Messages
+
+```java
+class MessageListener implements SecureCommsGroupListener {
+
+        public MessageListener() {
+        }
+
+        @Override
+        public void groupDestroyed(String groupID, String groupName) {
+            System.out.println("group was destroyed: " + groupName);
+        }
+
+        @Override
+        public void groupMemberAdded(String groupID, String groupName,
+                Contact newMember) {
+            System.out.println("member was added to group: " + newMember + " " 
+                    + groupName);
+        }
+
+        @Override
+        public void groupMemberRemoved(String groupID, String groupName,
+                Contact removedMember) {
+            System.out.println("member was removed from group: " + groupName + " " 
+                    + removedMember);
+        }
+
+        @Override
+        public void newGroup(String groupID, String groupName) {
+            System.out.println("group was created: " + groupName);
+        }
+
+        @Override
+        public void onMessage(Contact sender, byte[] groupMessage, 
+            String groupID, String groupName) {
+            System.out.println("Got message");
+            System.out.println("received group ID: " + groupID);
+            final String msg = sender.getName() + ": " 
+                + new String(groupMessage);
+            System.out.println(msg);
+      }
+}
+
+// ...
+
+MessageListener msgList = new MessageListener();
+SecureCommsGroupCallback cb =
+    SecureCommsGroupCallbackFactory.construct(cb, saife);
+try {
+    saife.addSecureCommsGroupListener(cb);
+} catch (final IllegalArgumentException iae) {
+    final String m = iae.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may also allow the endpoint to receive messages (via callbacks) from members of its ad-hoc messaging group.
+
+###Leaving the Ad-Hoc Messaging Group
+
+```java
+SecureCommsGroup group;
+List<String> groups = saife.ListGroups();
+
+try {
+    group = saife.getGroup(groups.get(0));
+} catch (final GroupNotFoundException gnfe) {
+    final String m = gnfe.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // leave the group, cannot do it group owner
+    group.removeSelft();
+} catch (final GroupPermissionDeniedException gpde) {
+    final String m = gpde.getMessage();
+    System.out.println(m);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final Exception e) {
+    final String m = e.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may allow the endpoint (if not the group owner) to leave the ad-hoc messaging group.
+
+##Secure Session Tasks
+
+If your application is utilizing SAIFE’s secure sessions (for voice calls, video calls, video feeds, etc.), application tasks include enabling presence and initializing/accepting secure sessions.
+
+###Enabling Presence
+
+```c++
+// Enable presence for the SAIFE server.
+try {
+  saife_ptr->EnablePresence();
+} catch (InvalidManagementStateException &e) {
+  std::cerr << e.error() << std::endl;
+} catch (UnlockRequiredException &e) {
+  std::cerr << e.error() << std::endl;
+}
+```
+
+```java
+// Enable presence for the SAIFE server.
+try {
+  saife.enablePresence();
+} catch (final InvalidManagementStateException e1) {
+  e1.printStackTrace();
+} catch (final UnlockRequiredException e1) {
+  e1.printStackTrace();
+}
+```
+
+Your application may allow the endpoint to establish presence (thus transitioning from the Unregistered state to the Registered state).  During the registration of presence, the endpoint authenticates itself to SAIFE’s network, and SAIFE’s network authenticates itself to the endpoint.  The endpoint in this state can initiate secure sessions with other endpoints in its secure contact group, as well as accept these sessions.  The endpoint must periodically update it online status with SAIFE’s network at an interval specified by your application.
+
+If the endpoint in the Registered state does not maintain its presence via updates, a registration timeout event will cause a transition back to the Unregistered state.
+
+###Initiating Sessions
+
+```c++
+try {
+  SaifeContact contact = saife_ptr->GetContactByName(sendTo);
+  SaifeSecureSessionInterface *session = saife_ptr->ConstructSecureSession();
+  session->Connect(contact, SaifeSecureSessionInterface::LOSSY, 10);
+  int rcvMsgCnt = 0;
+  for (std::vector<std::string>::iterator iter = messageList.begin(); iter != messageList.end(); ++iter) {
+    std::string sendMsg = *iter;
+    std::vector<uint8_t> msg_bytes(sendMsg.begin(), sendMsg.end());
+    session->Write(msg_bytes);
+    std::cout << "Data >: '" << sendMsg << "'" << std::endl;
+    try {
+      std::vector< uint8_t > data;
+      session->Read(&data, 1024, kSessionReadTimeMs);
+      std::string datastr(data.begin(), data.end());
+      std::cout << "Data <: '" << datastr << "'" << std::endl;
+      ++rcvMsgCnt;
+    } catch (SessionTimeoutException e) {
+      std::cout << "Huh ... missed an echo response.  No big deal." << std::endl;
+    }
+  }
+  std::cout << "Ok .. All done.  Sent " << messageList.size() << " messages and received " << rcvMsgCnt
+      << " messages" << std::endl;
+  session->Close();
+  saife_ptr->ReleaseSecureSession(session);
+
+} catch (SessionTimeoutException e) {
+  std::cout << "Timeout attempting to connect session" << std::endl;
+} catch (PresenceRequiredException e) {
+  std::cout << "Presence is not available" << std::endl;
+} catch (NoSuchContactException e) {
+  std::cout << "Contact was not found" << std::endl;
+} catch (saife::io::IOException e) {
+  std::cout << "I/O Error while attempting to connect session" << std::endl;
+}
+```
+
+```java
+try {
+  // Get the contact from the contact list.
+  final Contact contact = saife.getContactByName(sendTo);
+
+  System.out.println("Establishing a session with echo server " + contact.getName());
+  final SecureSession session = saife.constructSecureSession();
+
+  // Try to connect for 10 seconds.
+  session.connect(contact, TransportType.LOSSLESS, 10);
+  System.out.println("Established a session with echo server " + contact.getName());
+
+  int rcvMsgCnt = 0;
+  for (final String sendMsg : messageList) {
+
+    // Write session data to the echo server.
+    session.write(sendMsg.getBytes());
+    System.out.println("Data >: '" + sendMsg + "'");
+
+    try {
+
+      // Try to read session data back from the echo server, try for 5 seconds.
+      final byte[] data = session.read(1024, 5000);
+      System.out.println("Data <: '" + new String(data) + "'");
+      ++rcvMsgCnt;
+    } catch (final SessionTimeoutException e) {
+      System.out.println("Huh ... missed an echo response.  No big deal.");
+    }
+  }
+  System.out.println("Ok .. All done.  Sent " + messageList.size() + " messages and received " + rcvMsgCnt
+      + " messages");
+  session.close();
+  saife.releaseSecureSession(session);
+
+} catch (final SessionTimeoutException e) {
+  System.out.println("Oops ... seems like we couldn't connect securely.");
+} catch (final PresenceRequiredException e) {
+  System.out.println("Oops ... Looks like presence isn't ready.");
+} catch (final NoSuchContactException e) {
+  System.out.println("Oops ... Looks like echo server " + sendTo + " is not part of our contact list.");
+} catch (final IOException e) {
+  System.out.println("Oops ... seems like we couldn't connect.");
+}
+```
+
+Your application may allow the endpoint (in the Registered state) to establish sessions with peer endpoints within its secure contact group.  Before initiating a secure session with another endpoint, the initiating endpoint must reserve a relay session from SAIFE’s network, with the IP address of the relay (in encrypted form) provided to the endpoint.
+
+###Accepting Sessions
+
+```c++
+try {
+  // Wait for SAIFE clients to connect securely.
+  SaifeSecureSessionInterface *session = saife_ptr->Accept();
+  SaifeContact peer = session->GetPeer();
+  std::cout << "Hey ... " << peer.name() << " just connected." << std::endl;
+  std::thread handleSessThread(handleSession, session);
+  handleSessThread.detach();
+} catch (InvalidManagementStateException e) {
+  std::cerr << e.error() << std::endl;
+} catch (PresenceRequiredException e) {
+  std::cout << "Oops ... Looks like presence isn't ready." << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+} catch (InvalidSessionState e) {
+  std::cerr << e.error() << std::endl;
+}
+```
+
+```java
+try {
+  // Wait for SAIFE clients to connect securely.
+  final SecureSession session = saife.accept();
+
+  final Contact peer = session.getPeer();
+  System.out.println("Just received a incoming session from echo client " + peer.getName() + ". sess: " + session);
+
+  // Now give the session over to the SessionHandler to be run in a separate thread.
+  saifeThreadPool.submit(new SessionHandler(session));
+
+} catch (final InvalidManagementStateException e) {
+  e.printStackTrace();
+} catch (final InvalidSessionState e) {
+  e.printStackTrace();
+}
+```
+
+Your application may also allow the endpoint (in the Registered state) to accept sessions with peer endpoints within its secure contact group.  After a relay session is reserved, the initiating endpoint provides the targeted endpoint with the encrypted IP address of the relay.  Before the endpoints are added to the relay, the endpoints create – via the ECDH key-agreement protocol – a unique, ephemeral key for the session, allowing all data in transit to be encrypted.  Endpoints can exchange TCP (lossless) and/or UDP (lossy) frames.
+
+##Secure Network Share Tasks
+
+If your application is utilizing SAIFE’s secure network share (for text documents, presentations, spreadsheets, media files, etc.), application tasks include retrieving/creating a secure network share, sharing a secure network share, and writing to/reading from a secure network share.
+
+###Retrieving/Creating a Secure Network Share
+
+```java
+// This retrieve or creates a network share manager.
+// these will varry with implementation
+final String shareID = "some_text";
+final String storagePath = "/some/path";
+
+final PersistentStore persistentStore = new Persister();
+final NetworkShare ns;
+
+// create a manager
+final NetworkShareManager mgr = new NetworkShareManager(saife);
+
+try {
+    ns = mgr.getNetworkShare(shareID, storagePath, persistentStore);
+} catch (final IOException e1) {
+    System.out.println("getNetworkShare IO exception!");
+} catch (final NetworkShareDoesNotExistException e1) {
+    System.out.println("NetworkShareDoesNotExistException.  Creating "
+            + "NetworkShare.");
+    try {
+        ns = mgr.createNetworkShare(shareID, storagePath, persistentStore);
+    } catch (final IOException e) {
+        System.out.println("CreateNetworkShare IOException");
+        e.printStackTrace();
+    } catch (final NetworkShareExistsException e) {
+        System.out.println("Unrecoverable NetworkShareExistsException, "
+                + "since GetNetworkShare also failed.");
+    }
+}
+
+// implementation differs for each application
+public class Persister implements PersistentStore {
+    public Persister() {}
+    @Override 
+    public List<PersistedObject> getObjects(final String storagePath,
+            final String prefix) throws IOException {}
+    @Override
+    public releaseObjects(final List<PersistedObject> releaseObjects) {}
+    @Override
+    public InputStream getInputStream(final PersistedObject object) {}
+    @Override
+    public InputStream getInputStream(final String storagePath,
+            final String name) throws IOException {}
+    @Override 
+    public void releaseInputStream(final InputStream is) {}
+    @Override
+    public OutputStream getOutputStream(final PersistedObject object)
+            throws IOException {}
+    @Override
+    public OutputStream getOutputStream(final String storagePath,
+            final String name) throws IOException {}
+    @Override
+    public void releaseOutputStream(final OutputStream os) {}
+    @Override
+    public void deleteObject(final PersistedObject) throws IOException {}
+    @Override
+    public void deleteObject(final String storagePath, final String name) 
+            throws IOException {}
+}
+```
+
+Your application may allow the endpoint to retrieve/create a secure network share.  Secure network share requires the establishment of a file-sharing system, either via public cloud (using a cloud service provider, such as Amazon Simple Storage Service) or private cloud (using an enterprise network).
+
+###Sharing a Secure Network Share
+
+```java
+final String shareID = "some_text";
+final String storagePath = "/some/path";
+final PersistentStore persistentStore = new Persister();
+
+final NetworkShare ns;
+final Contact contact;
+
+try {
+    // get the network share
+    ns = mgr.getNetworkShare(shareID, storagePath, persistentStore);
+    // get the contact
+    contact = saife.getContactsByName("some_name").get(0);
+} catch (final NoSuchContactException nsce) {
+    final String m = nsce.getMessage();
+    System.out.println(m);
+} catch (final InvalidManagementStateException imse) {
+    final String m = imse.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+} catch (final NetworkShareDoesNotExistException nsdnee) {
+    final String m = nsdnee.getMessage();
+    System.out.println(m);
+}
+
+try {
+    // add the contact to the share
+    ns.addMember(contact);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final NotAllowedException nae) {
+    final String m = nae.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may allow the endpoint to share a secure network share with other endpoints within its secure contact group.  The network share owner must create the initial version of a 512-bit network share key (NSK).  The initiating endpoint uses each group member’s public key to wrap – via the AES algorithm – the NSK for each member.  The wrapped NSK is sent to each group member.
+
+###Removing Members from Secure Network Share 
+
+Your application may also allow the endpoint to remove members from the secure network share.
+
+###Writing to Secure Network Share
+
+Your application may allow the endpoint to write a file to the secure network share.  The endpoint uses the NSK to encrypt the file – via the AES algorithm – before writing it to the share.  The endpoint then sends a secure message to all peers indicating that a new file has been written to network storage.
+
+###Reading from Secure Network Share
+
+Your application may also allow the endpoint to read a file from the secure network share.  Upon receiving a secure notification message from a peer, the endpoint navigates to the location of the new or edited file, downloads the file, and decrypts the file using the NSK.
+
+##Secure Data-at-Rest Tasks
+
+If your application is utilizing SAIFE’s secure data-at-rest capability, application tasks include creating and deleting a secure volume.
+
+###Creating a Secure Volume
+
+```java
+// create a volume
+final SecureVolume.VolumeType vt = SecureVolume.VolumeType.PERMANENT;
+final String vFile = "/some/path/to/file";
+final String volLabel = "some_label";
+// must be multiple of 1024, at least 10MB
+final long volSize = 1024 * 1024 * 10;   
+
+final SecureVolume vol;
+
+try {
+    vol = saife.createVolume(vt, vFile, volLabel, volSize);
+} catch (final ProfisioningRequredException pre) {
+    final String m = pre.getMessage();
+    System.out.println(m);
+} catch (final UnlockRequiredException ure) {
+    final String m = ure.getMessage();
+    System.out.println(m);
+} catch (final IllegalArgumentException iae) {
+    final String m = iae.getMessage();
+    System.out.println(m);
+} catch (final IOException ioe) {
+    final String m = ioe.getMessage();
+    System.out.println(m);
+}
+```
+
+Your application may allow the endpoint to create a secure volume.  To secure data at rest (DAR) on the device, the endpoint uses its volume key (generated during the provisioning process) to encrypt – via the AES algorithm – the file.
+
+###Deleting a Secure Volume
+
+```java
+// delete a volume
+final SecureVolume vol;
+final List<SecureVolume> volList;
+
+volList = saife.listVolumes();
+vol = volList.get(0);
+
+saife.removeVolume(vol);
+```
+
+Your application may also allow the endpoint to delete a secure volume.
+
+#Additional Resources
+
+If you need additional help with the SAIFE Endpoint Library, please check out the following resources:
+
+* the [SAIFE Developer site](http://saifeinc.com/developers/) is a hub for information about the SAIFE SDK, highlighting practical use cases and key features;
+* our [GitHub page](https://github.com/saifeinc) showcases some sample applications; and
+* the [SAIFE Support Center](https://saife.zendesk.com/hc/en-us) allows you discuss your project, ask questions, and even receive ticket-based support.
+
+You can also call or email us directly:
+
+* (480) 219-0447
+* [support@saifeinc.com](mailto:support@saifeinc.com)
 
 #Release Notes
 
-* **Release 2.0.0** of the SAIFE® Endpoint Library was created on March 25, 2015.
-* **Release 1.0.0** of the SAIFE® Endpoint Library was created on September 15, 2014.
+* **Release 2.1.0** of the SAIFE Endpoint Library was created on November 6, 2015.
+* **Release 2.0.0** of the SAIFE Endpoint Library was created on March 5, 2015.
+* **Release 1.0.0** of the SAIFE Endpoint Library was created on September 29, 2014.
 
+#Acknowledgements
 
+The SAIFE Endpoint Library is built upon several open-source technologies.  SAIFE, Inc. is committed to the open-source community and maintains a public [GitHub page](https://github.com/saifeinc/) where all modifications to the open-source code are posted.
 
-# Acknowledgements
+The following is a complete list of open-source projects packaged with our SAIFE Endpoint Library:
 
-The SAIFE® Endpoint Library is built upon several open-source technologies. SAIFE Inc. is committed to the open source community and maintains a public [GitHub account](https://github.com/saifeinc/) where all modifications to the open source code are posted.
-
-The following is a complete list of open source projects packaged with our SAIFE products:
-
-* **libroxml** - [http://code.google.com/p/libroxml/](http://code.google.com/p/libroxml/ LGPL) LGPL, forked to [https://github.com/saifeinc/libroxml_cecfork](https://github.com/saifeinc/libroxml_cecfork)
-* **BOOST** - [http://www.boost.org](http://www.boost.org) Boost Software License Version 1.0
-* **gtest** - [http://code.google.com/p/googletest/](http://code.google.com/p/googletest/) New BSD License
-* **protobuf** - [http://code.google.com/p/protobuf/](http://code.google.com/p/protobuf/) BSD New
-* **libcurl** - [http://curl.haxx.se/libcurl/](http://curl.haxx.se/libcurl/) - [http://curl.haxx.se/docs/copyright.html](http://curl.haxx.se/docs/copyright.html)
-* **rapidjson** - [http://miloyip.github.io/rapidjson/](http://miloyip.github.io/rapidjson/) - The MIT License
-
-
-
+* **libroxml** (XML file parsing implementation)
+	* Website: [http://www.libroxml.net/](http://www.libroxml.net/)
+	* License: [GNU Lesser General Public License (LGPL)](https://www.gnu.org/licenses/lgpl.html)
+* **Boost** (C++ libraries)
+	* Website: [http://www.boost.org/](http://www.boost.org/)
+	* License: [Boost Software License (Version 1.0)](http://www.boost.org/users/license.html)
+* **Google Test** (C++ test framework)
+	* Website: [https://github.com/google/googletest](https://github.com/google/googletest)
+	* License: [SD 2-Clause License](https://opensource.org/licenses/bsd-license.php)
+* **Protocol Buffers** (data interchange format)
+	* Website: [https://developers.google.com/protocol-buffers/](https://developers.google.com/protocol-buffers/)
+	* License: [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause)
+* **libcurl** (URL transfer library)
+	* Website: [https://curl.haxx.se/libcurl/](https://curl.haxx.se/libcurl/)
+	* License: [Copyright](https://curl.haxx.se/docs/copyright.html)
+* **rapidjson** (JSON parser/generator)
+	* Website: [http://rapidjson.org/](http://rapidjson.org/)
+	* License: [MIT License](https://opensource.org/licenses/mit-license.php)
